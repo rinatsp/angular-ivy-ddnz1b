@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Directive, Injector, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Directive, Injector, OnDestroy,  OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 @Directive()
-export abstract class BaseFormClass<T> implements OnInit {
+export abstract class BaseFormClass<T> implements OnInit, OnDestroy {
   public form: FormGroup;
 
   protected readonly subscriptions: Subscription = new Subscription();
@@ -11,7 +11,7 @@ export abstract class BaseFormClass<T> implements OnInit {
 
   constructor(protected readonly injector: Injector) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     const formBuilder: FormBuilder = this.injector.get(FormBuilder);
 
     // create editable form
@@ -28,6 +28,10 @@ export abstract class BaseFormClass<T> implements OnInit {
         )
       );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   protected abstract getControls(): [string, AbstractControl][];
